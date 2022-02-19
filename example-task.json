@@ -1,0 +1,11 @@
+{
+  "title": "Example Task",
+  "description": "",
+  "test_data": {
+    "inputs": [
+      [1, 1],
+      [1, 0],
+      2, 3, 4],
+    "outputs": [2, 1, 1, 1, 5]
+  }
+}
