@@ -9,6 +9,6 @@ def current_price():
     return deso.Deso().getDeSoPrice()
 
 def test():
-    walletData = deso.Users.getWallet("BC1YLiM6eizVjWfSpk12VuSvMYdTS7ZkxiMvoeYJsrL8ALDqHSQ9pLD", includeCreatorCoin = True) # make includeCreatorCoin as false when you don't want to have creator coin investment in the response data
+    walletData = deso.
     return walletData
-#print(test())
+print(test())

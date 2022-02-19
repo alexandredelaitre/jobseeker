@@ -4,39 +4,44 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello Bulma!</title>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
 </head>
 <body>
-<section class="hero is-link">
-    <div class="hero-body">
-        <p class="title">
-            QuestMaster
-        </p>
-        <p class="subtitle">
-            Do task get $DESO.
-        </p>
-    </div>
+<nav>
+    <section class="hero is-link">
+        <div class="hero-body">
+            <p class="title">
+                <img src="{% static 'QuestMaster.png' %}" style="width: 25%; height: 25%"/>
+            </p>
+            <p class="subtitle">
+                Complete A Quest, Get A $DESO Bounty.
+            </p>
+        </div>
+    </section>
 </section>
+
 <section class="section">
-    <div class="box">
-        <div class="content">
-            <p><strong>Testing task name</strong> <small>@rainestormee</small> <small>1m</small></p>
-            <br>
-            <p>This is a testing task description click on this to get more info.</p>
-        </div>
-        <button class="button">Get More Info</button>
-        <button class="button is-success is-light">Complete Quest</button>
-    </div>
-    <div class="box">
-        <div class="content">
-            <p><strong>Adding program.</strong> <small>@rainestormee</small> <small>1hr</small></p>
-            <br>
-            <p>I need a program that adds two things together please.</p>
-        </div>
-        <button class="button">Get More Info</button>
-        <button class="button is-success" disabled>COMPLETED</button>
-    </div>
+        {% for i in quests %}
+            <div class="box">
+                <nav class="level">
+                    <div class="level-left">
+                        <div class="content">
+                            <p><strong>{{ i.title }}</strong> <small>{{ i.user }}</small> <small>{{ i.timeAgo }}</small></p>
+                            <br>
+                            <p>{{ i.description }}</p>
+
+                        
+                            <button class="button">Get More Info</button>
+                            <button class="button is-success is-light">Complete Quest</button>
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <button class="button is-success">{{ i.bounty }} $DESO</button>
+                    </div>
+                </nav>
+            </div>
+        {% endfor %}
 </section>
 </body>
 </html>
