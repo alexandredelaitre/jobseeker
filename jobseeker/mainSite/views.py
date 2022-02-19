@@ -10,4 +10,4 @@ def current_price():
 
 
 def home(request):
-    return render(request,'home.html',context=["price",current_price()])
+    return render(request,'home.html',context={"price",current_price()})
