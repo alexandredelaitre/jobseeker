@@ -31,11 +31,22 @@ def upload_file(request):
         form = CodeUpload()
     return render(request, 'home.html', {'form': form})
 
+
+
+
 def home(request):
     mainQuests = pickle.load( open( "toDoContracts.p", "rb" ) )
     postsubmission={}
     quests=[]
     uuidcode=""
+    
+    if request.method == 'POST':
+        form2 = CodeUpload(request.POST, request.FILES)
+        if form.is_valid():
+            #handle_uploaded_file(request.FILES['file'])
+            return HttpResponseRedirect('/success/url/')
+    else:
+        form = CodeUpload()
     
     if request.method=="POST":
         form=JobForm()
