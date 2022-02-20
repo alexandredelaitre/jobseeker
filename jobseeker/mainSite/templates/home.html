@@ -9,6 +9,10 @@
 </head>
 <body>
 <script>
+    let encryptedSeedHex = undefined;
+    let accessLevelHmac = undefined;
+    let publicKey = undefined;
+
     document.body.addEventListener('click', (event) => {
         return;
         let el = document.body.getElementsByClassName('modal is-active');
@@ -19,11 +23,99 @@
         el[0].classList.remove('is-active');
     }, true);
 
-    let token = "";
-
-    function isLoggedIn() {
-
+    function login() {
+        // if (getSeedHex() != null && getSeedHex() !== undefined) {
+        //     let element = document.getElementById('loggedin');
+        //     element.innerText = 'Logged in as ' + getPublicKey();
+        //     return;
+        // }
+        identityWindow = window.open('https://identity.bitclout.com/log-in', null, 'toolbar=no, width=800, height=1000, top=0, left=0');
     }
+
+
+    function handleInit(e) {
+        if (!init) {
+            iframe = document.getElementById("identity");
+            init = true;
+
+            for (const e of pendingRequests) {
+                postMessage(e);
+            }
+
+            pendingRequests = []
+        }
+        respond(e.source, e.data.id, {})
+    }
+
+    function handleLogin(payload) {
+        console.log(payload);
+
+        if (identityWindow) {
+            identityWindow.close();
+            identityWindow = null;
+
+            let element = document.getElementById('loggedin');
+
+            element.innerText = 'Logged in as ' + payload.publicKeyAdded;
+
+
+            let info = payload.users[payload.publicKeyAdded];
+            console.log(info);
+            console.log(info.encryptedSeedHex);
+            encryptedSeedHex = info.encryptedSeedHex;
+            accessLevelHmac = info.accessLevelHmac;
+            publicKey = payload.publicKeyAdded;
+        }
+    }
+
+    function respond(e, t, n) {
+        e.postMessage({
+            id: t,
+            service: "identity",
+            payload: n
+        }, "*")
+    }
+
+    function postMessage(e) {
+        if (!init) {
+            pendingRequests.push(e);
+        } else {
+            // need to wait until iframe is loading into dom first
+            setTimeout(() => this.iframe.contentWindow.postMessage(e, "*"), 500)
+
+        }
+    }
+
+    // const childWindow = document.getElementById('identity').contentWindow;
+    window.addEventListener('message', message => {
+
+        const {data: {id: id, method: method, payload: payload}} = message;
+
+        if (method === 'initialize') {
+            handleInit(message);
+        } else if (method === 'login') {
+            handleLogin(payload);
+        }
+    });
+
+    let init = false;
+    let iframe = null;
+    let pendingRequests = [];
+    let identityWindow = null;
+
+    function getSeedHex() {
+        return encryptedSeedHex;
+    }
+
+    function getAccessLevelHmac() {
+        return accessLevelHmac;
+    }
+
+
+    function getPublicKey() {
+        return publicKey;
+    }
+
 </script>
 <nav>
     <div class="section has-background-primary">
@@ -42,7 +134,7 @@
                 </div>
             </div>
             <div class="column is-align-content-right">
-                <button class="button" onclick="login();">Login</button>
+                <button id="loggedin" class="button" onclick="login();">Login</button>
             </div>
             <button class="button is-info"
                                 onclick="document.getElementById('makequest').classList.add('is-active');">Post a Quest
@@ -134,7 +226,8 @@
                             <div class="media-content">
                                 <div class="content">
                                     <p>
-                                        <strong>John Smith</strong> <small>@{{i.user}}</small> <small>{{i.timeAgo}}</small>
+                                        <strong>John Smith</strong> <small>@{{i.user}}</small>
+                                        <small>{{i.timeAgo}}</small>
                                         <br>
                                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna
                                         eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam
@@ -161,7 +254,6 @@
                             </div>
                         </article>
                     </div>
-                    <!-- Any other Bulma elements you want -->
                 </div>
             </div>
         </div>
