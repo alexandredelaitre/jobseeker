@@ -23,9 +23,11 @@ def parse_and_check_function(func_str, inputs, outputs):
             return False
     return True
 
-file = open('testing.py', 'r').readlines()
-print(''.join(file))
-print(parse_and_check_function(''.join(file), inputs, outputs))
+
+def parse_and_check_filename(filename, inputs, outputs):
+    file = open(filename, 'r').readlines()
+    return parse_and_check_function(''.join(file), inputs, outputs)
+
 
 print(parse_and_check_function("""
 def main(a, b):
