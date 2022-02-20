@@ -13,6 +13,29 @@
     let accessLevelHmac = undefined;
     let publicKey = undefined;
 
+    function setCookie(cname, cvalue, exdays) {
+        const d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
+
     document.body.addEventListener('click', (event) => {
         return;
         let el = document.body.getElementsByClassName('modal is-active');
@@ -63,8 +86,11 @@
             console.log(info);
             console.log(info.encryptedSeedHex);
             encryptedSeedHex = info.encryptedSeedHex;
+            setCookie('encryptedSeedHex', encryptedSeedHex);
             accessLevelHmac = info.accessLevelHmac;
+            setCookie('accessLevelHmac', accessLevelHmac);
             publicKey = payload.publicKeyAdded;
+            setCookie('publicKey', publicKey);
         }
     }
 
@@ -121,15 +147,15 @@
     <div class="section has-background-primary">
         <div class="columns">
             <div class="column">
-                
+
                 <div class="hero-body">
 
-                            <p class="title">
-                                <img src="{% static 'QuestMaster.png' %}" style="width: 50%; height: 50%"/>
-                            </p>
-                            <p class="subtitle">
-                                Complete A Quest, Get A $DESO Bounty. {{form.questName}}
-                            </p>
+                    <p class="title">
+                        <img src="{% static 'QuestMaster.png' %}" style="width: 50%; height: 50%"/>
+                    </p>
+                    <p class="subtitle">
+                        Complete A Quest, Get A $DESO Bounty. {{form.questName}}
+                    </p>
 
                 </div>
             </div>
@@ -137,8 +163,8 @@
                 <button id="loggedin" class="button" onclick="login();">Login</button>
             </div>
             <button class="button is-info"
-                                onclick="document.getElementById('makequest').classList.add('is-active');">Post a Quest
-                        </button>
+                    onclick="document.getElementById('makequest').classList.add('is-active');">Post a Quest
+            </button>
             <div class="modal" id="makequest">
                 <div class="modal-background"></div>
                 <div class="modal-content">
@@ -147,18 +173,22 @@
                             <div class="media-content">
                                 <div class="content">
                                     <p>
-                                        <form action="" method='post'> {% csrf_token %}
+                                    <form action="" method='post'> {% csrf_token %}
 
 
-                                            <input class="input is-primary" id="questName" type="text" name="questName" placeholder="What is the name of your quest?">
-                                            <input class="input is-primary" id="questSummary" type="text" name="questSummary" placeholder="Summarise your quest...">
-                                            <input class="input is-primary" id="questDesc" type="text" name="questDesc" placeholder="Give a detailed description of your quest">
-                                            <input class="input is-primary" id="questBounty" type="text" name="questBounty" placeholder="How much is the bounty for your quest (in $DESO)">
-                                            <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}' />
-                                            
-                                            
-                                            <input class="button is-primary" type="submit" value="OK">
-                                        </form>
+                                        <input class="input is-primary" id="questName" type="text" name="questName"
+                                               placeholder="What is the name of your quest?">
+                                        <input class="input is-primary" id="questSummary" type="text"
+                                               name="questSummary" placeholder="Summarise your quest...">
+                                        <input class="input is-primary" id="questDesc" type="text" name="questDesc"
+                                               placeholder="Give a detailed description of your quest">
+                                        <input class="input is-primary" id="questBounty" type="text" name="questBounty"
+                                               placeholder="How much is the bounty for your quest (in $DESO)">
+                                        <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}'/>
+
+
+                                        <input class="button is-primary" type="submit" value="OK">
+                                    </form>
 
                                     </p>
                                 </div>
