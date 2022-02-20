@@ -1,12 +1,10 @@
-import deso
-from django.shortcuts import render
-from .forms import JobForm
-from .models import Job
 import pickle
 import uuid
 
-from django.http import HttpResponseRedirect
+import deso
+from django.shortcuts import render
 
+from .forms import JobForm
 
 inputs = [[1, 1], [1, 0], [1, -1], [10, 11]]
 outputs = [2, 1, 0, 21]
@@ -23,11 +21,18 @@ def check_function(func, inputs, outputs):
 
 def parse_and_check_function(func_str, inputs, outputs):
     for n in range(len(inputs)):
+
         i = inputs[n]
+        args = ""
+        if isinstance(i, list):
+            args = ",".join(str(a) for a in i)
+        else:
+            args = str(i)
         ex_locals = {}
         exec(func_str + '\n' +
-             'zzzzzzzzzzzzzzzzzzzzzzz = ((main(' + ",".join(str(a) for a in i) + ')) ==' + str(
-            outputs[n]) + ')', {"built" : __builtins__}, ex_locals)
+             'zzzzzzzzzzzzzzzzzzzzzzz = ((main(' + args + ')) ==' + str(outputs[n]) + ')', {"built": __builtins__},
+             ex_locals
+             )
 
         if not bool(ex_locals['zzzzzzzzzzzzzzzzzzzzzzz']):
             return False
@@ -37,9 +42,6 @@ def parse_and_check_function(func_str, inputs, outputs):
 def parse_and_check_filename(filename, inputs, outputs):
     file = open(filename, 'r').readlines()
     return parse_and_check_function(''.join(file), inputs, outputs)
-
-
-
 
 
 # Create your views here.
@@ -52,19 +54,14 @@ def init():
     pickle.dump([], open("toDoContracts.p", "wb"))
 
 
-
-
 def home(request):
-    mainQuests = pickle.load( open( "toDoContracts.p", "rb" ) )
-    postsubmission={}
-    quests=[]
-    uuidcode=""
-    
-    if request.method=="POST":
-        form=JobForm()
+    mainQuests = pickle.load(open("toDoContracts.p", "rb"))
+    postsubmission = {}
+    quests = []
+    uuidcode = ""
 
-
-
+    if request.method == "POST":
+        form = JobForm()
 
 
 def home(request):
@@ -78,60 +75,56 @@ def home(request):
         print(request.POST.keys())
         if form.is_valid():
             form.save()
-            context={'form':form}
+            context = {'form': form}
         try:
-            user=request.COOKIES.get('publicKey')
-            questName=request.POST['questName']
-            summary=request.POST['questSummary']
-            questDesc=request.POST['questDesc']
-            questBounty=request.POST['questBounty']
-            inputs_=eval(request.POST['inputs'])
-            outputs_=eval(request.POST['outputs'])
+            user = request.COOKIES.get('publicKey')
+            questName = request.POST['questName']
+            summary = request.POST['questSummary']
+            questDesc = request.POST['questDesc']
+            questBounty = request.POST['questBounty']
+            inputs_ = eval(request.POST['inputs'])
+            outputs_ = eval(request.POST['outputs'])
             quests = {
-                    'title': questName,
-                    'timeAgo': '1m',
-                    'description': questDesc,
-                    'user': user,
-                    'bounty': questBounty,
-                    'summary':summary,
-                    'uuidcode':uuid.uuid4(),
-                    'attempted':False,
-                    'complete':False,
-                    'attemptedCode':"",
-                    'inputs':inputs_,
-                    'outputs':outputs_,
-                }
-            
+                'title': questName,
+                'timeAgo': '1m',
+                'description': questDesc,
+                'user': user,
+                'bounty': questBounty,
+                'summary': summary,
+                'uuidcode': uuid.uuid4(),
+                'attempted': False,
+                'complete': False,
+                'attemptedCode': "",
+                'inputs': inputs_,
+                'outputs': outputs_,
+            }
+
         except Exception as e:
             print(e)
-            uuidcode=request.POST['uuidcode']
-            completedCode=request.POST['completedCode']
-            postsubmission=completedCode
-            
+            uuidcode = request.POST['uuidcode']
+            completedCode = request.POST['completedCode']
+            postsubmission = completedCode
 
-    if uuidcode!="":
+    if uuidcode != "":
         print(uuidcode)
         print(completedCode)
         print(mainQuests)
         print(type(mainQuests[0]['inputs']))
         for i in range(len(mainQuests)):
-            if str(mainQuests[i]['uuidcode'])==uuidcode:
+            if str(mainQuests[i]['uuidcode']) == uuidcode:
                 print("found")
 
-                mainQuests[i]['attempted']=True
-                mainQuests[i]['attemptedCode']=completedCode
-                if parse_and_check_function(completedCode,mainQuests[i]['inputs'],mainQuests[i]['outputs']):
+                mainQuests[i]['attempted'] = True
+                mainQuests[i]['attemptedCode'] = completedCode
+                if parse_and_check_function(completedCode, mainQuests[i]['inputs'], mainQuests[i]['outputs']):
                     mainQuests.remove(mainQuests[i])
                     break
-            
 
     if quests != []:
         mainQuests.append(quests)
 
-    
+    pickle.dump(mainQuests, open("toDoContracts.p", "wb"))
 
-    pickle.dump(mainQuests, open( "toDoContracts.p", "wb" ))
-
-    return render(request, 'home.html', context={'quests':mainQuests, 'submission':postsubmission})
+    return render(request, 'home.html', context={'quests': mainQuests, 'submission': postsubmission})
 
 # print(current_price()['price_24h'])
