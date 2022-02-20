@@ -13,13 +13,18 @@ def current_price():
 def home(request):
     if request.method=="POST":
         form=JobForm()
+        print(request.POST.keys())
         if form.is_valid():
             print("AAAA")
             form.save()
             print("BBBBB")
             context={'form':form}
         
-        print(request.POST)
+        print(request.POST['questName'])
+        questName=request.POST['questName']
+        summary=request.POST['questSummary']
+        questDesc=request.POST['questSummary']
+        questBounty=request.POST['questSummary']
     context={}
     quests = [
         {
