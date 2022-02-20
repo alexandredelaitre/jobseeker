@@ -9,81 +9,187 @@
 </head>
 <body>
 <script>
+    let encryptedSeedHex = undefined;
+    let accessLevelHmac = undefined;
+    let publicKey = undefined;
+
+    function setCookie(cname, cvalue, exdays) {
+        const d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        let expires = "expires=" + d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+
+
     document.body.addEventListener('click', (event) => {
+        return;
         let el = document.body.getElementsByClassName('modal is-active');
+
         if (el.length === 0) {
             return;
         }
         el[0].classList.remove('is-active');
     }, true);
 
-    let token = "";
-
-    function isLoggedIn() {
-
+    function login() {
+        // if (getSeedHex() != null && getSeedHex() !== undefined) {
+        //     let element = document.getElementById('loggedin');
+        //     element.innerText = 'Logged in as ' + getPublicKey();
+        //     return;
+        // }
+        identityWindow = window.open('https://identity.bitclout.com/log-in', null, 'toolbar=no, width=800, height=1000, top=0, left=0');
     }
+
+
+    function handleInit(e) {
+        if (!init) {
+            iframe = document.getElementById("identity");
+            init = true;
+
+            for (const e of pendingRequests) {
+                postMessage(e);
+            }
+
+            pendingRequests = []
+        }
+        respond(e.source, e.data.id, {})
+    }
+
+    function handleLogin(payload) {
+        console.log(payload);
+
+        if (identityWindow) {
+            identityWindow.close();
+            identityWindow = null;
+
+            let element = document.getElementById('loggedin');
+
+            element.innerText = 'Logged in as ' + payload.publicKeyAdded;
+
+
+            let info = payload.users[payload.publicKeyAdded];
+            console.log(info);
+            console.log(info.encryptedSeedHex);
+            encryptedSeedHex = info.encryptedSeedHex;
+            setCookie('encryptedSeedHex', encryptedSeedHex);
+            accessLevelHmac = info.accessLevelHmac;
+            setCookie('accessLevelHmac', accessLevelHmac);
+            publicKey = payload.publicKeyAdded;
+            setCookie('publicKey', publicKey);
+        }
+    }
+
+    function respond(e, t, n) {
+        e.postMessage({
+            id: t,
+            service: "identity",
+            payload: n
+        }, "*")
+    }
+
+    function postMessage(e) {
+        if (!init) {
+            pendingRequests.push(e);
+        } else {
+            // need to wait until iframe is loading into dom first
+            setTimeout(() => this.iframe.contentWindow.postMessage(e, "*"), 500)
+
+        }
+    }
+
+    // const childWindow = document.getElementById('identity').contentWindow;
+    window.addEventListener('message', message => {
+
+        const {data: {id: id, method: method, payload: payload}} = message;
+
+        if (method === 'initialize') {
+            handleInit(message);
+        } else if (method === 'login') {
+            handleLogin(payload);
+        }
+    });
+
+    let init = false;
+    let iframe = null;
+    let pendingRequests = [];
+    let identityWindow = null;
+
+    function getSeedHex() {
+        return encryptedSeedHex;
+    }
+
+    function getAccessLevelHmac() {
+        return accessLevelHmac;
+    }
+
+
+    function getPublicKey() {
+        return publicKey;
+    }
+
 </script>
 <nav>
     <div class="section has-background-primary">
         <div class="columns">
             <div class="column">
+
                 <div class="hero-body">
+
                     <p class="title">
                         <img src="{% static 'QuestMaster.png' %}" style="width: 50%; height: 50%"/>
                     </p>
                     <p class="subtitle">
-                        Complete A Quest, Get A $DESO Bounty.
+                        Complete A Quest, Get A $DESO Bounty. {{form.questName}}
                     </p>
+
                 </div>
             </div>
             <div class="column is-align-content-right">
-                <button class="button" onclick="login();">Login</button>
+                <button id="loggedin" class="button" onclick="login();">Login</button>
             </div>
-        </div>
-    </div>
-    </section>
-
-    <section class="section">
-        {% for i in quests %}
-        <div class="box">
-            <nav class="level">
-                <div class="level-left">
-                    <div class="content">
-                        <p><strong>{{ i.title }}</strong> <small>@{{ i.user }}</small> <small>{{ i.timeAgo }}</small>
-                        </p>
-                        <br>
-                        <p>{{ i.description }}</p>
-
-
-                        <button class="button is-info"
-                                onclick="document.getElementById('{{ i.title }}').classList.add('is-active');">Get More
-                            Info
-                        </button>
-                        <button class="button">Complete Quest</button>
-                    </div>
-                </div>
-                <div class="level-right">
-                    <button class="button is-primary">{{ i.bounty }} $DESO</button>
-                </div>
-            </nav>
-            <div class="modal" id="{{i.title}}">
+            <button class="button is-info"
+                    onclick="document.getElementById('makequest').classList.add('is-active');">Post a Quest
+            </button>
+            <div class="modal" id="makequest">
                 <div class="modal-background"></div>
                 <div class="modal-content">
                     <div class="box">
                         <article class="media">
-                            <figure class="media-left">
-                                <p class="image is-64x64">
-                                    <img src="https://bulma.io/images/placeholders/128x128.png">
-                                </p>
-                            </figure>
                             <div class="media-content">
                                 <div class="content">
                                     <p>
-                                        <strong>John Smith</strong> <small>@{{i.user}}</small> <small>{{i.timeAgo}}</small>
-                                        <br>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna
-                                        eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam
-                                        finibus odio quis feugiat facilisis.
+                                    <form action="" method='post'> {% csrf_token %}
+
+
+                                        <input class="input is-primary" id="questName" type="text" name="questName"
+                                               placeholder="What is the name of your quest?">
+                                        <input class="input is-primary" id="questSummary" type="text"
+                                               name="questSummary" placeholder="Summarise your quest...">
+                                        <input class="input is-primary" id="questDesc" type="text" name="questDesc"
+                                               placeholder="Give a detailed description of your quest">
+                                        <input class="input is-primary" id="questBounty" type="text" name="questBounty"
+                                               placeholder="How much is the bounty for your quest (in $DESO)">
+                                        <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}'/>
+
+
+                                        <input class="button is-primary" type="submit" value="OK">
+                                    </form>
+
                                     </p>
                                 </div>
                                 <nav class="level is-mobile">
@@ -109,8 +215,97 @@
                     <!-- Any other Bulma elements you want -->
                 </div>
             </div>
+
+        </div>
+    </div>
+    </section>
+
+    <section class="section">
+        {% for i in quests %}
+        <div class="box">
+            <nav class="level">
+                <div class="level-left">
+                    <div class="content">
+                        <p><strong>{{ i.title }}</strong> <small>@{{ i.user }}</small> <small>{{ i.timeAgo }}</small>
+                        </p>
+                        <br>
+                        <p>{{ i.summary }}</p>
+
+                        
+
+
+                        <button class="button is-info"
+                                onclick="document.getElementById('{{ i.title }}').classList.add('is-active');">Get More
+                            Info
+                        </button>
+                        
+                    </div>
+                </div>
+                <div class="level-right">
+                    <button class="button is-primary">{{ i.bounty }} $DESO</button>
+                </div>
+            </nav>
+            <div class="modal" id="{{i.title}}">
+                <div class="modal-background"></div>
+                <div class="modal-content">
+                    <div class="box">
+                        <article class="media">
+                            <figure class="media-left">
+                                <p class="image is-64x64">
+                                    <img src="https://bulma.io/images/placeholders/128x128.png">
+                                </p>
+                            </figure>
+                            <div class="media-content">
+                                <div class="content">
+                                    <p>
+                                        <small>@{{i.user}}</small>
+                                        <small>{{i.timeAgo}}</small>
+                                        <br>
+                                        {{i.description}}
+                                        
+                                    </p>
+                                    {{i.uuid}}
+                                    <form action="" method='post'> {% csrf_token %}
+                                        <input class="input is-primary" id="uuidcode" type="text" name="uuidcode"
+                                               placeholder="What is the messages uuid?">
+                                        <input class="input is-primary" id="completedCode" type="text" name="completedCode"
+                                               placeholder="Have you completed the quest?">
+                                        
+
+
+
+                                        <button class="button is-success" type="submit" value="OK">Complete Quest</button>
+                                    
+                                    </form>
+                                </div>
+                                <nav class="level is-mobile">
+                                    <div class="level-left">
+                                        <a class="level-item">
+                                            <span class="icon is-small"><i class="fas fa-reply"></i></span>
+                                        </a>
+                                        <a class="level-item">
+                                            <span class="icon is-small"><i class="fas fa-retweet"></i></span>
+                                        </a>
+                                        <a class="level-item">
+                                            <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                                        </a>
+                                    </div>
+                                </nav>
+                            </div>
+                            <div class="media-right">
+                                <button class="delete"
+                                        onclick="document.getElementsByClassName('modal is-active')[0].classList.remove('is-active');"></button>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
         </div>
         {% endfor %}
+
+
+        {{submission}}
+
     </section>
 </body>
 </html>
