@@ -3,9 +3,9 @@ from django.shortcuts import render
 from .forms import JobForm
 from .models import Job
 import pickle
-import json
 import uuid
 
+from django.http import HttpResponseRedirect
 import verification
 
 # Create your views here.
@@ -13,10 +13,12 @@ import verification
 def current_price():
     return deso.Deso().getDeSoPrice()
 
-def init():
-    pickle.dump([], open( "toDoContracts.p", "wb" ))
 
-init()
+def init():
+    pickle.dump([], open("toDoContracts.p", "wb"))
+
+
+
 
 def home(request):
     mainQuests = pickle.load( open( "toDoContracts.p", "rb" ) )
@@ -26,6 +28,19 @@ def home(request):
     
     if request.method=="POST":
         form=JobForm()
+
+
+
+
+
+def home(request):
+    mainQuests = pickle.load(open("toDoContracts.p", "rb"))
+    postsubmission = {}
+    quests = []
+    uuidcode = ""
+
+    if request.method == "POST":
+        form = JobForm()
         print(request.POST.keys())
         if form.is_valid():
             form.save()
@@ -70,8 +85,7 @@ def home(request):
                     break
             
 
-    
-    if quests!=[]:
+    if quests != []:
         mainQuests.append(quests)
 
     
