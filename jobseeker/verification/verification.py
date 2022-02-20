@@ -33,3 +33,8 @@ print(parse_and_check_function("""
 def main(a, b):
     return a * b
 """, inputs, outputs))
+
+print(parse_and_check_function("""
+def main(a, b):
+    return [b, a]
+""", [[1, 2], [1, 0], [0, 0]], [[2, 1], [0, 1], [0, 0]]))
