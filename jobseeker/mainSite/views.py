@@ -13,8 +13,8 @@ def current_price():
 
 def send_message(request):
 
-    publicKey = request.json['publicKey']
-    body = request.json['body']
+    publicKey = request.json()['publicKey']
+    body = request.json()['body']
 
     header = {
         "content-type": "application/json"
