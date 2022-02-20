@@ -80,7 +80,7 @@ def home(request):
             if mainQuests[i]['uuidcode']==uuidcode:
                 mainQuests[i]['attempted']=True
                 mainQuests[i]['attemptedCode']=completedCode
-                if verification.parse_and_check_function(completedCode,mainQuests[i]['inputs'],mainQuests[i]['outputs']):
+                if verification.parse_and_check_function(completedCode,eval(mainQuests[i]['inputs']),eval(mainQuests[i]['outputs'])):
                     mainQuests.remove(mainQuests[i])
                     break
             
