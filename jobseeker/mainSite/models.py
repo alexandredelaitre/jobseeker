@@ -6,3 +6,8 @@ class Job (models.Model):
     questSummary=models.TextField(max_length=400)
     questDesc=models.TextField(max_length=4000)
     questName=models.TextField(max_length=50)
+
+class Code (models.Model):
+    uuidcode=models.TextField(max_length=400)
+    completedCode=models.TextField(max_length=25000)
+

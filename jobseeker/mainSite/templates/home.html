@@ -231,12 +231,14 @@
                         <br>
                         <p>{{ i.summary }}</p>
 
+                        
+
 
                         <button class="button is-info"
                                 onclick="document.getElementById('{{ i.title }}').classList.add('is-active');">Get More
                             Info
                         </button>
-                        <button class="button">Complete Quest</button>
+                        
                     </div>
                 </div>
                 <div class="level-right">
@@ -260,7 +262,21 @@
                                         <small>{{i.timeAgo}}</small>
                                         <br>
                                         {{i.description}}
+                                        
                                     </p>
+                                    {{i.uuidcode}}
+                                    <form action="" method='post'> {% csrf_token %}
+                                        <input class="input is-primary" id="uuidcode" type="text" name="uuidcode"
+                                               placeholder="What is the messages uuid?">
+                                        <input class="input is-primary" id="completedCode" type="text" name="completedCode"
+                                               placeholder="Have you completed the quest?">
+                                        
+
+
+
+                                        <button class="button is-success" type="submit" value="OK">Complete Quest</button>
+                                    
+                                    </form>
                                 </div>
                                 <nav class="level is-mobile">
                                     <div class="level-left">
@@ -286,6 +302,10 @@
             </div>
         </div>
         {% endfor %}
+
+
+        {{submission}}
+
     </section>
 </body>
 </html>
