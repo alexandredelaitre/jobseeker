@@ -229,7 +229,7 @@
                         <p><strong>{{ i.title }}</strong> <small>@{{ i.user }}</small> <small>{{ i.timeAgo }}</small>
                         </p>
                         <br>
-                        <p>{{ i.description }}</p>
+                        <p>{{ i.summary }}</p>
 
 
                         <button class="button is-info"
@@ -256,12 +256,10 @@
                             <div class="media-content">
                                 <div class="content">
                                     <p>
-                                        <strong>John Smith</strong> <small>@{{i.user}}</small>
+                                        <small>@{{i.user}}</small>
                                         <small>{{i.timeAgo}}</small>
                                         <br>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna
-                                        eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam
-                                        finibus odio quis feugiat facilisis.
+                                        {{i.description}}
                                     </p>
                                 </div>
                                 <nav class="level is-mobile">
