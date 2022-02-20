@@ -6,6 +6,28 @@ from django.shortcuts import render
 
 from .forms import JobForm
 
+from twilio.rest import Client
+import dotenv
+import os
+
+dotenv.load_dotenv()
+
+# Your Account SID from twilio.com/console
+account_sid = os.environ['TWILIO_SID']
+
+# Your Auth Token from twilio.com/console
+auth_token = os.environ['TWILIO_SECRET']
+
+client = Client(account_sid, auth_token)
+
+def send_message(msg):
+    client.messages.create(
+        to="+447579065474",
+        from_="+447700158128",
+        body=msg)
+
+
+
 inputs = [[1, 1], [1, 0], [1, -1], [10, 11]]
 outputs = [2, 1, 0, 21]
 
@@ -117,6 +139,7 @@ def home(request):
                 mainQuests[i]['attempted'] = True
                 mainQuests[i]['attemptedCode'] = completedCode
                 if parse_and_check_function(completedCode, mainQuests[i]['inputs'], mainQuests[i]['outputs']):
+                    send_message("Your task has been completed!")
                     mainQuests.remove(mainQuests[i])
                     break
 
@@ -125,6 +148,6 @@ def home(request):
 
     pickle.dump(mainQuests, open("toDoContracts.p", "wb"))
 
-    return render(request, 'home.html', context={'quests': mainQuests, 'submission': postsubmission})
+    return render(request, 'home.html', context={'quests': mainQuests, 'submission': postsubmission, 'completed': True})
 
 # print(current_price()['price_24h'])

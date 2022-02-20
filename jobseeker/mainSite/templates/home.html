@@ -222,6 +222,12 @@
 
         </div>
     </div>
+    {% if completed.value %}
+    <div class="notification is-link" id="notification">
+        <button class="delete" onclick="document.getElementById('notification').remove()"></button>
+        You have completed a task!
+    </div>
+    {% endif %}
     </section>
 
     <section class="section">
