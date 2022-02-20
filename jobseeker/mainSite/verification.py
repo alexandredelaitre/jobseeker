@@ -29,12 +29,13 @@ def parse_and_check_filename(filename, inputs, outputs):
     return parse_and_check_function(''.join(file), inputs, outputs)
 
 
-print(parse_and_check_function("""
-def main(a, b):
-    return a * b
-""", inputs, outputs))
+if __name__ == '__main__':
+    print(parse_and_check_function("""
+    def main(a, b):
+        return a * b
+    """, inputs, outputs))
 
-print(parse_and_check_function("""
-def main(a, b):
-    return [b, a]
-""", [[1, 2], [1, 0], [0, 0]], [[2, 1], [0, 1], [0, 0]]))
+    print(parse_and_check_function("""
+    def main(a, b):
+        return [b, a]
+    """, [[1, 2], [1, 0], [0, 0]], [[2, 1], [0, 1], [0, 0]]))
