@@ -58,7 +58,7 @@ def home(request):
 
     if uuidcode!="":   
         for i in range(len(mainQuests)):
-            if mainQuests[i]['uuidcode']==uuidcode:
+            if mainQuests[i]['uuid']==uuidcode:
                 mainQuests[i]['attempted']=True
                 mainQuests[i]['attemptedCode']=completedCode
 
