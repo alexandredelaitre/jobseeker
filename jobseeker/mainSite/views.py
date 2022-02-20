@@ -44,6 +44,8 @@ def home(request):
         form2 = CodeUpload(request.POST, request.FILES)
         if form.is_valid():
             #handle_uploaded_file(request.FILES['file'])
+
+
             return HttpResponseRedirect('/success/url/')
     else:
         form = CodeUpload()
