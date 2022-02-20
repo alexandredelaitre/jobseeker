@@ -10,4 +10,5 @@ class Job (models.Model):
 class Code (models.Model):
     uuidcode=models.TextField(max_length=400)
     completedCode=models.TextField(max_length=25000)
+    file = forms.FileField()
 

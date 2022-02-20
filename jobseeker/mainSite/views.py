@@ -1,10 +1,12 @@
 import deso
 from django.shortcuts import render
-from .forms import JobForm
-from .models import Job
+from .forms import JobForm,CodeUpload
+from .models import Code, Job
 import pickle
 import json
 import uuid
+from django.http import HttpResponseRedirect
+
 
 
 
@@ -17,6 +19,17 @@ def init():
     pickle.dump([], open( "toDoContracts.p", "wb" ))
 
 #init()
+
+
+def upload_file(request):
+    if request.method == 'POST':
+        form = CodeUpload(request.POST, request.FILES)
+        if form.is_valid():
+            #handle_uploaded_file(request.FILES['file'])
+            return HttpResponseRedirect('/success/url/')
+    else:
+        form = CodeUpload()
+    return render(request, 'home.html', {'form': form})
 
 def home(request):
     mainQuests = pickle.load( open( "toDoContracts.p", "rb" ) )
