@@ -17,24 +17,25 @@ def parse_and_check_function(func_str, inputs, outputs):
         ex_locals = {}
         exec(func_str + '\n' +
              'zzzzzzzzzzzzzzzzzzzzzzz = ((main(' + ",".join(str(a) for a in i) + ')) ==' + str(
-            outputs[n]) + ')', None, ex_locals)
+            outputs[n]) + ')', {"built" : __builtins__}, ex_locals)
 
         if not bool(ex_locals['zzzzzzzzzzzzzzzzzzzzzzz']):
             return False
     return True
 
 
-print(parse_and_check_function("""
-def main(a, b):
-    return a + b
-""", inputs, outputs))
+def parse_and_check_filename(filename, inputs, outputs):
+    file = open(filename, 'r').readlines()
+    return parse_and_check_function(''.join(file), inputs, outputs)
 
-print(parse_and_check_function("""
-def main(a, b):
-    return a * b
-""", inputs, outputs))
 
-print(parse_and_check_function("""
-def main(a, b):
-    return [b, a]
-""", [[1, 2], [1, 0], [0, 0]], [[2, 1], [0, 1], [0, 0]]))
+if __name__ == '__main__':
+    print(parse_and_check_function("""
+    def main(a, b):
+        return a * b
+    """, inputs, outputs))
+
+    print(parse_and_check_function("""
+    def main(a, b):
+        return [b, a]
+    """, [[1, 2], [1, 0], [0, 0]], [[2, 1], [0, 1], [0, 0]]))

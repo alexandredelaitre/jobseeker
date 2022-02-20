@@ -11,5 +11,3 @@ class CodeForm(forms.ModelForm):
     class Meta:
         model=Code
         fields='__all__'
-class CodeUpload(forms.Form):
-    file = forms.FileField()

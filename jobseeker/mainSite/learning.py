@@ -9,6 +9,6 @@ def current_price():
     return deso.Deso().getDeSoPrice()
 
 def test():
-    walletData = deso.
+    walletData = deso
     return walletData
 print(test())
