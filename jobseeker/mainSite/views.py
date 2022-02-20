@@ -1,14 +1,12 @@
 import deso
 from django.shortcuts import render
-from .forms import JobForm,CodeUpload
-from .models import Code, Job
+from .forms import JobForm
+from .models import Job
 import pickle
 import json
 import uuid
-from django.http import HttpResponseRedirect
 
-
-
+import verification
 
 # Create your views here.
 
@@ -18,21 +16,7 @@ def current_price():
 def init():
     pickle.dump([], open( "toDoContracts.p", "wb" ))
 
-#init()
-
-
-def upload_file(request):
-    if request.method == 'POST':
-        form = CodeUpload(request.POST, request.FILES)
-        if form.is_valid():
-            #handle_uploaded_file(request.FILES['file'])
-            return HttpResponseRedirect('/success/url/')
-    else:
-        form = CodeUpload()
-    return render(request, 'home.html', {'form': form})
-
-
-
+init()
 
 def home(request):
     mainQuests = pickle.load( open( "toDoContracts.p", "rb" ) )
@@ -40,21 +24,11 @@ def home(request):
     quests=[]
     uuidcode=""
     
-    if request.method == 'POST':
-        form2 = CodeUpload(request.POST, request.FILES)
-        if form.is_valid():
-            #handle_uploaded_file(request.FILES['file'])
-            return HttpResponseRedirect('/success/url/')
-    else:
-        form = CodeUpload()
-    
     if request.method=="POST":
         form=JobForm()
         print(request.POST.keys())
         if form.is_valid():
-            print("AAAA")
             form.save()
-            print("BBBBB")
             context={'form':form}
         try:
             user=request.COOKIES.get('publicKey')
@@ -62,6 +36,8 @@ def home(request):
             summary=request.POST['questSummary']
             questDesc=request.POST['questDesc']
             questBounty=request.POST['questBounty']
+            inputs_=eval(request.POST['inputs'])
+            outputs_=eval(request.POST['outputs'])
             quests = {
                     'title': questName,
                     'timeAgo': '1m',
@@ -69,28 +45,36 @@ def home(request):
                     'user': user,
                     'bounty': questBounty,
                     'summary':summary,
-                    'uuid':uuid.uuid4(),
+                    'uuidcode':uuid.uuid4(),
                     'attempted':False,
                     'complete':False,
-                    'attemptedCode':""
+                    'attemptedCode':"",
+                    'inputs':inputs_,
+                    'outputs':outputs_,
                 }
             
-        except:
+        except Exception as e:
+            print(e)
             uuidcode=request.POST['uuidcode']
             completedCode=request.POST['completedCode']
             postsubmission=completedCode
 
-    if uuidcode!="":   
+    if uuidcode!="":
+        print(completedCode)
         for i in range(len(mainQuests)):
-            if mainQuests[i]['uuid']==uuidcode:
+            if mainQuests[i]['uuidcode']==uuidcode:
                 mainQuests[i]['attempted']=True
                 mainQuests[i]['attemptedCode']=completedCode
+                if verification.parse_and_check_function(completedCode,mainQuests[i]['inputs'],mainQuests[i]['outputs']):
+                    mainQuests.remove(mainQuests[i])
+                    break
+            
 
     
     if quests!=[]:
         mainQuests.append(quests)
 
-
+    
 
     pickle.dump(mainQuests, open( "toDoContracts.p", "wb" ))
 

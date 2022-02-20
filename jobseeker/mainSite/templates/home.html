@@ -184,6 +184,10 @@
                                                placeholder="Give a detailed description of your quest">
                                         <input class="input is-primary" id="questBounty" type="text" name="questBounty"
                                                placeholder="How much is the bounty for your quest (in $DESO)">
+                                        <input class="input is-primary" id="inputs" type="text" name="inputs"
+                                               placeholder="Give example inputs">
+                                        <input class="input is-primary" id="outputs" type="text" name="outputs"
+                                               placeholder="Give example outputs">  
                                         <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}'/>
 
 
@@ -264,7 +268,7 @@
                                         {{i.description}}
                                         
                                     </p>
-                                    {{i.uuid}}
+                                    
                                     <form action="" method='post'> {% csrf_token %}
                                         <input class="input is-primary" id="uuidcode" type="text" name="uuidcode"
                                                placeholder="What is the messages uuid?">
