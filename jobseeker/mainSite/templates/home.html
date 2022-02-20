@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
-    <script src="/static/login.js"></script>
+    <script src="{% static login.js %}"></script>
 </head>
 <body>
 <script>
@@ -79,7 +79,7 @@
 
             let element = document.getElementById('loggedin');
 
-            element.innerText = 'Logged in as ' + payload.publicKeyAdded;
+            element.innerText = 'Logged In';
 
 
             let info = payload.users[payload.publicKeyAdded];
@@ -92,6 +92,11 @@
             publicKey = payload.publicKeyAdded;
             setCookie('publicKey', publicKey);
         }
+    }
+
+    function post() {
+        identityWindow = window.open('https://identity.bitclout.com/api/v0/submit-post', null, 'toolbar=no, width=800, height=1000, top=0, left=0');
+
     }
 
     function respond(e, t, n) {
@@ -159,60 +164,63 @@
 
                 </div>
             </div>
-            <div class="column is-align-content-right">
-                <button id="loggedin" class="button" onclick="login();">Login</button>
-            </div>
-            <button class="button is-info"
-                    onclick="document.getElementById('makequest').classList.add('is-active');">Post a Quest
-            </button>
-            <div class="modal" id="makequest">
-                <div class="modal-background"></div>
-                <div class="modal-content">
-                    <div class="box">
-                        <article class="media">
-                            <div class="media-content">
-                                <div class="content">
-                                    <p>
-                                    <form action="" method='post'> {% csrf_token %}
+            <div class="column">
+                <div class="buttons">
+                    <button id="loggedin" class="button" onclick="login();">Login</button>
+                    <button class="button is-info"
+                            onclick="document.getElementById('makequest').classList.add('is-active');">Post a Quest
+                    </button>
+                </div>
+                <div class="modal" id="makequest">
+                    <div class="modal-background"></div>
+                    <div class="modal-content">
+                        <div class="box">
+                            <article class="media">
+                                <div class="media-content">
+                                    <div class="content">
+                                        <p>
+                                        <form action="" method='post'> {% csrf_token %}
 
 
-                                        <input class="input is-primary" id="questName" type="text" name="questName"
-                                               placeholder="What is the name of your quest?">
-                                        <input class="input is-primary" id="questSummary" type="text"
-                                               name="questSummary" placeholder="Summarise your quest...">
-                                        <input class="input is-primary" id="questDesc" type="text" name="questDesc"
-                                               placeholder="Give a detailed description of your quest">
-                                        <input class="input is-primary" id="questBounty" type="text" name="questBounty"
-                                               placeholder="How much is the bounty for your quest (in $DESO)">
-                                        <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}'/>
+                                            <input class="input is-primary" id="questName" type="text" name="questName"
+                                                   placeholder="What is the name of your quest?">
+                                            <input class="input is-primary" id="questSummary" type="text"
+                                                   name="questSummary" placeholder="Summarise your quest...">
+                                            <input class="input is-primary" id="questDesc" type="text" name="questDesc"
+                                                   placeholder="Give a detailed description of your quest">
+                                            <input class="input is-primary" id="questBounty" type="text"
+                                                   name="questBounty"
+                                                   placeholder="How much is the bounty for your quest (in $DESO)">
+                                            <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}'/>
 
 
-                                        <input class="button is-primary" type="submit" value="OK">
-                                    </form>
+                                            <input class="button is-primary" type="submit" value="OK" onclick="post();">
+                                        </form>
 
-                                    </p>
-                                </div>
-                                <nav class="level is-mobile">
-                                    <div class="level-left">
-                                        <a class="level-item">
-                                            <span class="icon is-small"><i class="fas fa-reply"></i></span>
-                                        </a>
-                                        <a class="level-item">
-                                            <span class="icon is-small"><i class="fas fa-retweet"></i></span>
-                                        </a>
-                                        <a class="level-item">
-                                            <span class="icon is-small"><i class="fas fa-heart"></i></span>
-                                        </a>
+                                        </p>
                                     </div>
-                                </nav>
-                            </div>
-                            <div class="media-right">
-                                <button class="delete"
-                                        onclick="document.getElementsByClassName('modal is-active')[0].classList.remove('is-active');"></button>
-                            </div>
-                        </article>
+                                    <nav class="level is-mobile">
+                                        <div class="level-left">
+                                            <a class="level-item">
+                                                <span class="icon is-small"><i class="fas fa-reply"></i></span>
+                                            </a>
+                                            <a class="level-item">
+                                                <span class="icon is-small"><i class="fas fa-retweet"></i></span>
+                                            </a>
+                                            <a class="level-item">
+                                                <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                                            </a>
+                                        </div>
+                                    </nav>
+                                </div>
+                                <div class="media-right">
+                                    <button class="delete"
+                                            onclick="document.getElementsByClassName('modal is-active')[0].classList.remove('is-active');"></button>
+                                </div>
+                            </article>
+                        </div>
+                        <!-- Any other Bulma elements you want -->
                     </div>
-                    <!-- Any other Bulma elements you want -->
                 </div>
             </div>
 
@@ -280,7 +288,9 @@
                             </div>
                             <div class="media-right">
                                 <button class="delete"
-                                        onclick="document.getElementsByClassName('modal is-active')[0].classList.remove('is-active');"></button>
+                                        onclick="document.getElementsByClassName('modal is-active')[0]
+                                        .classList.remove('is-active');">
+                                </button>
                             </div>
                         </article>
                     </div>
