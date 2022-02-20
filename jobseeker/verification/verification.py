@@ -17,17 +17,15 @@ def parse_and_check_function(func_str, inputs, outputs):
         ex_locals = {}
         exec(func_str + '\n' +
              'zzzzzzzzzzzzzzzzzzzzzzz = ((main(' + ",".join(str(a) for a in i) + ')) ==' + str(
-            outputs[n]) + ')', None, ex_locals)
+            outputs[n]) + ')', {"built" : __builtins__}, ex_locals)
 
         if not bool(ex_locals['zzzzzzzzzzzzzzzzzzzzzzz']):
             return False
     return True
 
-
-print(parse_and_check_function("""
-def main(a, b):
-    return a + b
-""", inputs, outputs))
+file = open('testing.py', 'r').readlines()
+print(''.join(file))
+print(parse_and_check_function(''.join(file), inputs, outputs))
 
 print(parse_and_check_function("""
 def main(a, b):
